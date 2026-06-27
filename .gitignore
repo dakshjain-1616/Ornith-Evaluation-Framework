@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Evaluation run artifacts (keep _results dirs but ignore raw logs)
+evaluation/**/_results/*.log
+evaluation/**/_results/*_output.log
+
+# Ollama model files
+models/*.gguf
+models/*.bin
+
+# Environment configs
+.env
+*.local
+
+# Testing
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adaptive Skill Ceiling — Ornith</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        background: #0a0e1a;
+        color: #c8d6e5;
+        font-family: 'Courier New', 'Consolas', monospace;
+        padding: 20px;
+        min-height: 100vh;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+        text-align: center;
+        padding: 30px 0;
+        border-bottom: 1px solid #1a2040;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    .header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 10%;
+        width: 80%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #00f0ff, #ff00aa, #00ff88, transparent);
+        animation: scanline 3s ease-in-out infinite;
+    }
+    @keyframes scanline {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+    }
+    .header h1 {
+        font-size: 2.2em;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00f0ff, #ff00aa, #00ff88);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        letter-spacing: 2px;
+    }
+    .header .subtitle {
+        color: #556688;
+        font-size: 0.9em;
+        margin-top: 8px;
+    }
+
+    /* Ceiling Badge */
+    .ceiling-badge {
+        text-align: center;
+        padding: 30px;
+        margin: 20px 0 30px;
+        border: 2px solid #00ff88;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(0,255,136,0.08), transparent);
+        animation: glowPulse 2s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+        0%, 100% { box-shadow: 0 0 20px rgba(0,255,136,0.2); }
+        50% { box-shadow: 0 0 40px rgba(0,255,136,0.5); }
+    }
+    .ceiling-badge .label {
+        font-size: 0.85em;
+        color: #556688;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+    }
+    .ceiling-badge .level {
+        font-size: 3.5em;
+        font-weight: 700;
+        color: #00ff88;
+        margin: 10px 0;
+        text-shadow: 0 0 30px rgba(0,255,136,0.4);
+    }
+    .ceiling-badge .tier {
+        font-size: 1.1em;
+        color: #00ff88;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+    }
+    .ceiling-badge .meta {
+        color: #445577;
+        font-size: 0.8em;
+        margin-top: 12px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+    .stat-box {
+        background: #0d1225;
+        border: 1px solid #1a2040;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #00f0ff, transparent);
+    }
+    .stat-box .value {
+        font-size: 1.8em;
+        font-weight: 700;
+        color: #00f0ff;
+    }
+    .stat-box .label {
+        font-size: 0.75em;
+        color: #556688;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 5px;
+    }
+
+    /* Chart */
+    .chart-container {
+        background: #0d1225;
+        border: 1px solid #1a2040;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        position: relative;
+    }
+    .chart-container::before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: 20%;
+        width: 60%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #ff00aa, transparent);
+    }
+    .chart-container h2 {
+        color: #00f0ff;
+        font-size: 1em;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #1a2040;
+        padding-bottom: 10px;
+    }
+    .chart-container svg {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Table */
+    .rounds-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 0.85em;
+    }
+    .rounds-table th {
+        background: #0d1225;
+        color: #00f0ff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.75em;
+        padding: 10px 12px;
+        border-bottom: 2px solid #1a2040;
+        text-align: left;
+    }
+    .rounds-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #111833;
+        color: #8899bb;
+    }
+    .rounds-table tr:hover td {
+        background: rgba(0, 240, 255, 0.03);
+    }
+    .rounds-table tr:last-child td {
+        border-bottom: none;
+    }
+    .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+    .badge-pass {
+        background: rgba(0, 255, 136, 0.15);
+        color: #00ff88;
+        border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+    .badge-fail {
+        background: rgba(255, 51, 102, 0.15);
+        color: #ff3366;
+        border: 1px solid rgba(255, 51, 102, 0.3);
+    }
+    .level-cell {
+        color: #ff00aa;
+        font-weight: 600;
+    }
+    .code-preview {
+        font-family: 'Courier New', monospace;
+        font-size: 0.8em;
+        color: #556688;
+        max-width: 250px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Status Indicators */
+    .status-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 6px;
+    }
+    .status-dot.pass { background: #00ff88; box-shadow: 0 0 6px #00ff88; }
+    .status-dot.fail { background: #ff3366; box-shadow: 0 0 6px #ff3366; }
+
+    /* Footer */
+    .footer {
+        text-align: center;
+        padding: 20px;
+        color: #334466;
+        font-size: 0.8em;
+        border-top: 1px solid #1a2040;
+        margin-top: 30px;
+    }
+
+    /* Error / Loading states */
+    .error-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #ff3366;
+    }
+    .error-state .icon { font-size: 3em; margin-bottom: 15px; }
+    .loading {
+        text-align: center;
+        padding: 60px 20px;
+        color: #556688;
+    }
+    .loading .spinner {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border: 2px solid #1a2040;
+        border-top-color: #00f0ff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⟡ ADAPTIVE SKILL CEILING — ORNITH ⟡</h1>
+        <div class="subtitle">Binary Search Evaluation · 10 Difficulty Levels</div>
+    </div>
+
+    <!-- Data injected by main.py -->
+    <div id="app-data" style="display:none;">
+        <!--
+        The main.py script updates this section with JSON data.
+        Example data structure:
+        {
+            "ceiling": 5,
+            "total_rounds": 4,
+            "total_time": 12.5,
+            "badge_color": "#00ff88",
+            "badge_text": "EXCEPTIONAL",
+            "avg_ttft": 0.823,
+            "levels_tested": "L5, L8, L6, L7",
+            "history": [
+                {"round": 1, "level": 5, "pass": true, "ttft": 0.75, "prompt_eval_speed": 45.2, "code": "def func():..."},
+                ...
+            ]
+        }
+        -->
+    </div>
+
+    <div id="app">
+        <div class="loading" id="loading-state">
+            <div class="spinner"></div>
+            <div>Loading evaluation data...</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Adaptive Skill Ceiling Framework v1.0 · <span id="timestamp">Loading...</span>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Load data from the embedded JSON or fallback to example data
+    function loadData() {
+        try {
+            // Try to read from injected JSON in a script tag
+            var scriptTag = document.getElementById('evaluation-data');
+            if (scriptTag) {
+                return JSON.parse(scriptTag.textContent);
+            }
+        } catch(e) {}
+        return null;
+    }
+
+    function buildDashboard(data) {
+        if (!data || !data.history || data.history.length === 0) {
+            document.getElementById('app').innerHTML =
+                '<div class="error-state"><div class="icon">⚠</div><h2>No Evaluation Data Available</h2>' +
+                '<p>Run <code>python -m evaluation.skill_ceiling.main</code> to generate results.</p></div>';
+            document.getElementById('timestamp').textContent = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+            return;
+        }
+
+        var rounds = data.total_rounds || data.history.length;
+        var history = data.history;
+        var ceiling = data.ceiling || 0;
+        var badgeColor = data.badge_color || '#00ff88';
+        var badgeText = data.badge_text || 'EXCEPTIONAL';
+        var avgTtft = data.avg_ttft || (history.reduce(function(s, h) { return s + (h.ttft || 0); }, 0) / Math.max(history.filter(function(h) { return h.ttft; }).length, 1));
+        var levelsTested = data.levels_tested || history.map(function(h) { return 'L' + h.level; }).join(', ');
+
+        // Build SVG trajectory
+        var svgWidth = Math.max(600, rounds * 80);
+        var svgHeight = 400;
+        var margin = 50;
+        var plotW = svgWidth - 2 * margin;
+        var plotH = svgHeight - 2 * margin;
+
+        var polyPoints = [];
+        var dots = '';
+        history.forEach(function(h, i) {
+            var x = margin + i * plotW / Math.max(rounds - 1, 1);
+            var y = margin + plotH - (h.level - 1) * plotH / 9;
+            polyPoints.push(x + ',' + y);
+            var color = h.pass ? '#00ff88' : '#ff3366';
+            dots += '<circle cx="' + x + '" cy="' + y + '" r="7" fill="' + color + '" stroke="#0a0e1a" stroke-width="2">';
+            dots += '<title>Round ' + h.round + ': Level ' + h.level + ' (' + (h.pass ? 'PASS' : 'FAIL') + ')</title>';
+            dots += '</circle>';
+        });
+
+        var polyline = polyPoints.length > 1 ? '<polyline points="' + polyPoints.join(' ') + '" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="6,3" />' : '';
+
+        var gridlines = '';
+        for (var i = 1; i <= 10; i++) {
+            var y = margin + plotH - (i - 1) * plotH / 9;
+            gridlines += '<line x1="' + margin + '" y1="' + y + '" x2="' + (svgWidth - margin) + '" y2="' + y + '" stroke="#1a2040" stroke-width="1" />';
+            gridlines += '<text x="' + (margin - 10) + '" y="' + (y + 4) + '" fill="#556688" font-size="12" text-anchor="end">L' + i + '</text>';
+        }
+
+        var xLabels = '';
+        history.forEach(function(h) {
+            var x = margin + (h.round - 1) * plotW / Math.max(rounds - 1, 1);
+            xLabels += '<text x="' + x + '" y="' + (svgHeight - 10) + '" fill="#556688" font-size="11" text-anchor="middle">R' + h.round + '</text>';
+        });
+
+        // Build table rows
+        var tableRows = '';
+        history.forEach(function(h) {
+            var badgeHtml = h.pass ?
+                '<span class="badge badge-pass"><span class="status-dot pass"></span>PASS</span>' :
+                '<span class="badge badge-fail"><span class="status-dot fail"></span>FAIL</span>';
+            var preview = (h.code || '').replace(/\\n/g, ' ').replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 80);
+            var ttftStr = h.ttft ? h.ttft.toFixed(3) + 's' : 'N/A';
+            var speedStr = h.prompt_eval_speed ? h.prompt_eval_speed.toFixed(1) + ' t/s' : 'N/A';
+            tableRows += '<tr>' +
+                '<td>' + h.round + '</td>' +
+                '<td><span class="level-cell">L' + h.level + '</span></td>' +
+                '<td>' + badgeHtml + '</td>' +
+                '<td>' + ttftStr + '</td>' +
+                '<td>' + speedStr + '</td>' +
+                '<td class="code-preview">' + preview + '</td>' +
+                '</tr>';
+        });
+
+        // Assemble dashboard HTML
+        var html =
+            '<div class="ceiling-badge">' +
+                '<div class="label">Verified Skill Ceiling</div>' +
+                '<div class="level">Level ' + ceiling + '</div>' +
+                '<div class="tier" style="color:' + badgeColor + '">' + badgeText + '</div>' +
+                '<div class="meta">' + rounds + ' rounds · ' + data.total_time.toFixed(2) + 's total</div>' +
+            '</div>' +
+
+            '<div class="stats-grid">' +
+                '<div class="stat-box"><div class="value">' + rounds + '</div><div class="label">Total Rounds</div></div>' +
+                '<div class="stat-box"><div class="value">' + (data.total_time ? data.total_time.toFixed(2) + 's' : 'N/A') + '</div><div class="label">Total Time</div></div>' +
+                '<div class="stat-box"><div class="value">' + avgTtft.toFixed(3) + 's</div><div class="label">Avg TTFT</div></div>' +
+                '<div class="stat-box"><div class="value" style="font-size:1.2em">' + levelsTested + '</div><div class="label">Levels Tested</div></div>' +
+            '</div>' +
+
+            '<div class="chart-container">' +
+                '<h2>⟐ Binary Search Trajectory</h2>' +
+                '<svg viewBox="0 0 ' + svgWidth + ' ' + svgHeight + '" xmlns="http://www.w3.org/2000/svg">' +
+                    gridlines + xLabels + polyline + dots +
+                '</svg>' +
+            '</div>' +
+
+            '<div class="chart-container">' +
+                '<h2>⟐ Round Details</h2>' +
+                '<table class="rounds-table">' +
+                    '<thead><tr>' +
+                        '<th>Round</th><th>Level</th><th>Verdict</th><th>TTFT</th><th>Prompt Speed</th><th>Code Preview</th>' +
+                    '</tr></thead>' +
+                    '<tbody>' + tableRows + '</tbody>' +
+                '</table>' +
+            '</div>';
+
+        document.getElementById('app').innerHTML = html;
+        document.getElementById('timestamp').textContent = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+    }
+
+    // Initialize
+    var data = loadData();
+    if (data) {
+        buildDashboard(data);
+    } else {
+        // Show loading, then try again (in case data loads async)
+        // For VS Code Webview, the data is injected synchronously
+        document.getElementById('app').innerHTML =
+            '<div class="error-state"><div class="icon">📡</div><h2>Awaiting Data Feed</h2>' +
+            '<p>Connect to evaluation runner to populate dashboard.</p></div>';
+        document.getElementById('timestamp').textContent = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+    }
+})();
+</script>
+</body>
+</html>

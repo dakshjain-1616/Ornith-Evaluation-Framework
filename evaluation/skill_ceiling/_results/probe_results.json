@@ -1,0 +1,26 @@
+{
+  "3": {
+    "pass": true,
+    "tests_passed": 4,
+    "tests_failed": 0,
+    "total_tests": 4,
+    "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.1.0, pluggy-1.6.0 -- /usr/bin/python3\ncachedir: .pytest_cache\nrootdir: /tmp/skill_ceiling/L3\nplugins: asyncio-1.4.0, anyio-4.13.0\nasyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 4 items\n\ntest_task.py::TestCreateSchemaAndQuery::test_returns_list_of_tuples PASSED [ 25%]\ntest_task",
+    "code_preview": "import sqlite3\n\ndef create_schema_and_query(db_path: str) -> list[tuple]:\n    \"\"\"\n    Creates a SQLite database, populates it with sample data, \n    and returns book details joined with author names.\n"
+  },
+  "5": {
+    "pass": false,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "total_tests": 0,
+    "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.1.0, pluggy-1.6.0 -- /usr/bin/python3\ncachedir: .pytest_cache\nrootdir: /tmp/skill_ceiling/L5\nplugins: asyncio-1.4.0, anyio-4.13.0\nasyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 0 items / 1 error\n\n==================================== ERRORS ====================================\n",
+    "code_preview": "from .exceptions import (\n       DecodeError,\n       ExpiredSignatureError,\n       InvalidAlgorithmError,\n       InvalidAudienceError,\n       ...\n       SignatureError, # Wait, is it here?\n   )"
+  },
+  "6": {
+    "pass": true,
+    "tests_passed": 6,
+    "tests_failed": 0,
+    "total_tests": 6,
+    "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.1.0, pluggy-1.6.0 -- /usr/bin/python3\ncachedir: .pytest_cache\nrootdir: /tmp/skill_ceiling/L6\nplugins: asyncio-1.4.0, anyio-4.13.0\nasyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 6 items\n\ntest_task.py::TestManageSession::test_store_new_session PASSED           [ 16%]\ntest_task.p",
+    "code_preview": "import json\n\ndef manage_session(redis_client, user_id: str, new_session_data: dict | None = None) -> dict:\n    \"\"\"\n    Manages user sessions in Redis.\n    \n    Args:\n        redis_client: A Redis-like"
+  }
+}

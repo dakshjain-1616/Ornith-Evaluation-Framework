@@ -1,0 +1,7 @@
+{
+  "pass": true,
+  "tests_passed": 6,
+  "tests_failed": 0,
+  "code_preview": "import jwt\n\ndef validate_jwt(token: str, secret: str = \"secret\") -> tuple[int, dict]:\n    try:\n        payload = jwt.decode(token, secret, algorithms=[\"HS256\"])\n        return (200, {\"user\": payload[\"sub\"]})\n    except jwt.ExpiredSignatureError:\n        return (403, {\"error\": \"Token expired\"})\n    e",
+  "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.1.0, pluggy-1.6.0 -- /usr/bin/python3\ncachedir: .pytest_cache\nrootdir: /tmp/skill_ceiling/L5\nplugins: asyncio-1.4.0, anyio-4.13.0\nasyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 6 items\n\ntest_task.py::TestValidateJWT::test_valid_token PASSED                   [ 16%]\ntest_task.p"
+}

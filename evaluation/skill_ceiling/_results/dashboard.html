@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adaptive Skill Ceiling — Ornith</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        background: #0a0e1a;
+        color: #c8d6e5;
+        font-family: 'Courier New', 'Consolas', monospace;
+        padding: 20px;
+        min-height: 100vh;
+    }
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    .header {
+        text-align: center;
+        padding: 30px 0;
+        border-bottom: 1px solid #1a2040;
+        margin-bottom: 30px;
+    }
+    .header h1 {
+        font-size: 2.2em;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00f0ff, #ff00aa, #00ff88);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        letter-spacing: 2px;
+    }
+    .header .subtitle {
+        color: #556688;
+        font-size: 0.9em;
+        margin-top: 8px;
+    }
+    .ceiling-badge {
+        text-align: center;
+        padding: 30px;
+        margin: 20px 0 30px;
+        border: 2px solid #00ff88;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #00ff8844, transparent);
+        animation: glowPulse 2s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+        0%, 100% { box-shadow: 0 0 20px #00ff8844; }
+        50% { box-shadow: 0 0 40px #00ff8888; }
+    }
+    .ceiling-badge .label {
+        font-size: 0.85em;
+        color: #556688;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+    }
+    .ceiling-badge .level {
+        font-size: 3.5em;
+        font-weight: 700;
+        color: #00ff88;
+        margin: 10px 0;
+        text-shadow: 0 0 30px #00ff8866;
+    }
+    .ceiling-badge .tier {
+        font-size: 1.1em;
+        color: #00ff88;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+    }
+    .chart-container {
+        background: #0d1225;
+        border: 1px solid #1a2040;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    .chart-container h2 {
+        color: #00f0ff;
+        font-size: 1em;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #1a2040;
+        padding-bottom: 10px;
+    }
+    .chart-container svg {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        height: auto;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+    .stat-box {
+        background: #0d1225;
+        border: 1px solid #1a2040;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+    }
+    .stat-box .value {
+        font-size: 1.8em;
+        font-weight: 700;
+        color: #00f0ff;
+    }
+    .stat-box .label {
+        font-size: 0.75em;
+        color: #556688;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 5px;
+    }
+    .rounds-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 0.85em;
+    }
+    .rounds-table th {
+        background: #0d1225;
+        color: #00f0ff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.75em;
+        padding: 10px 12px;
+        border-bottom: 2px solid #1a2040;
+        text-align: left;
+    }
+    .rounds-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #111833;
+        color: #8899bb;
+    }
+    .rounds-table tr:hover td {
+        background: rgba(0, 240, 255, 0.03);
+    }
+    .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+    .badge-pass {
+        background: rgba(0, 255, 136, 0.15);
+        color: #00ff88;
+        border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+    .badge-fail {
+        background: rgba(255, 51, 102, 0.15);
+        color: #ff3366;
+        border: 1px solid rgba(255, 51, 102, 0.3);
+    }
+    .level-cell {
+        color: #ff00aa;
+        font-weight: 600;
+    }
+    .code-preview {
+        font-family: 'Courier New', monospace;
+        font-size: 0.8em;
+        color: #556688;
+        max-width: 250px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .footer {
+        text-align: center;
+        padding: 20px;
+        color: #334466;
+        font-size: 0.8em;
+        border-top: 1px solid #1a2040;
+        margin-top: 30px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⟡ ADAPTIVE SKILL CEILING — ORNITH ⟡</h1>
+        <div class="subtitle">Binary Search Evaluation · 10 Difficulty Levels</div>
+    </div>
+
+    <div class="ceiling-badge">
+        <div class="label">Verified Skill Ceiling</div>
+        <div class="level">Level 5</div>
+        <div class="tier">EXCEPTIONAL</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="value">4</div>
+            <div class="label">Total Rounds</div>
+        </div>
+        <div class="stat-box">
+            <div class="value">17.41s</div>
+            <div class="label">Total Time</div>
+        </div>
+        <div class="stat-box">
+            <div class="value">0.050s</div>
+            <div class="label">Avg TTFT</div>
+        </div>
+        <div class="stat-box">
+            <div class="value">L8, L4, L6, L5</div>
+            <div class="label">Levels Tested</div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h2>⟐ Binary Search Trajectory</h2>
+        <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- Grid -->
+            <line x1="50" y1="350.0" x2="550" y2="350.0" stroke="#1a2040" stroke-width="1" /><text x="40" y="354.0" fill="#556688" font-size="12" text-anchor="end">L1</text><line x1="50" y1="316.6666666666667" x2="550" y2="316.6666666666667" stroke="#1a2040" stroke-width="1" /><text x="40" y="320.6666666666667" fill="#556688" font-size="12" text-anchor="end">L2</text><line x1="50" y1="283.3333333333333" x2="550" y2="283.3333333333333" stroke="#1a2040" stroke-width="1" /><text x="40" y="287.3333333333333" fill="#556688" font-size="12" text-anchor="end">L3</text><line x1="50" y1="250.0" x2="550" y2="250.0" stroke="#1a2040" stroke-width="1" /><text x="40" y="254.0" fill="#556688" font-size="12" text-anchor="end">L4</text><line x1="50" y1="216.66666666666666" x2="550" y2="216.66666666666666" stroke="#1a2040" stroke-width="1" /><text x="40" y="220.66666666666666" fill="#556688" font-size="12" text-anchor="end">L5</text><line x1="50" y1="183.33333333333334" x2="550" y2="183.33333333333334" stroke="#1a2040" stroke-width="1" /><text x="40" y="187.33333333333334" fill="#556688" font-size="12" text-anchor="end">L6</text><line x1="50" y1="150.0" x2="550" y2="150.0" stroke="#1a2040" stroke-width="1" /><text x="40" y="154.0" fill="#556688" font-size="12" text-anchor="end">L7</text><line x1="50" y1="116.66666666666666" x2="550" y2="116.66666666666666" stroke="#1a2040" stroke-width="1" /><text x="40" y="120.66666666666666" fill="#556688" font-size="12" text-anchor="end">L8</text><line x1="50" y1="83.33333333333331" x2="550" y2="83.33333333333331" stroke="#1a2040" stroke-width="1" /><text x="40" y="87.33333333333331" fill="#556688" font-size="12" text-anchor="end">L9</text><line x1="50" y1="50.0" x2="550" y2="50.0" stroke="#1a2040" stroke-width="1" /><text x="40" y="54.0" fill="#556688" font-size="12" text-anchor="end">L10</text>
+            <!-- Axis labels -->
+            <text x="50.0" y="390" fill="#556688" font-size="11" text-anchor="middle">R1</text><text x="216.66666666666666" y="390" fill="#556688" font-size="11" text-anchor="middle">R2</text><text x="383.3333333333333" y="390" fill="#556688" font-size="11" text-anchor="middle">R3</text><text x="550.0" y="390" fill="#556688" font-size="11" text-anchor="middle">R4</text>
+            <!-- Trajectory line -->
+            <polyline points="50.0,116.66666666666666 216.66666666666666,250.0 383.3333333333333,183.33333333333334 550.0,216.66666666666666" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="6,3" />
+            <!-- Data points -->
+            <circle cx="50.0" cy="116.66666666666666" r="7" fill="#ff3366" stroke="#0a0e1a" stroke-width="2" /><circle cx="216.66666666666666" cy="250.0" r="7" fill="#00ff88" stroke="#0a0e1a" stroke-width="2" /><circle cx="383.3333333333333" cy="183.33333333333334" r="7" fill="#ff3366" stroke="#0a0e1a" stroke-width="2" /><circle cx="550.0" cy="216.66666666666666" r="7" fill="#00ff88" stroke="#0a0e1a" stroke-width="2" />
+        </svg>
+    </div>
+
+    <div class="chart-container">
+        <h2>⟐ Round Details</h2>
+        <table class="rounds-table">
+            <thead>
+                <tr>
+                    <th>Round</th>
+                    <th>Level</th>
+                    <th>Verdict</th>
+                    <th>TTFT</th>
+                    <th>Prompt Speed</th>
+                    <th>Code Preview</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            <tr>
+                <td>1</td>
+                <td><span class="level-cell">L8</span></td>
+                <td><span class="badge badge-fail">❌ FAIL</span></td>
+                <td>0.050s</td>
+                <td>500.0 t/s</td>
+                <td class="code-preview">import os   def distributed_lock(redis_client, lock_name: str, timeout: int = 10</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><span class="level-cell">L4</span></td>
+                <td><span class="badge badge-pass">✅ PASS</span></td>
+                <td>0.050s</td>
+                <td>500.0 t/s</td>
+                <td class="code-preview">import asyncio   async def fetch_with_retry(fetch_func, max_retries: int = 3) -&gt;</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><span class="level-cell">L6</span></td>
+                <td><span class="badge badge-fail">❌ FAIL</span></td>
+                <td>0.050s</td>
+                <td>500.0 t/s</td>
+                <td class="code-preview">import json   def manage_session(redis_client, user_id: str, new_session_data: d</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><span class="level-cell">L5</span></td>
+                <td><span class="badge badge-pass">✅ PASS</span></td>
+                <td>0.050s</td>
+                <td>500.0 t/s</td>
+                <td class="code-preview">import jwt import time   def validate_jwt(token: str, secret: str = "secret") -&gt;</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        Adaptive Skill Ceiling Framework v1.0 · 2026-06-27 13:00 UTC
+    </div>
+</div>
+</body>
+</html>
